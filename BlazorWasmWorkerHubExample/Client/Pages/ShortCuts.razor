@@ -1,0 +1,29 @@
+﻿@page "/shortcuts"
+
+<div @ref="page" tabindex="0" @onkeydown="OnKeyDown">
+    <h3>ShortCuts</h3>
+    <label>Press Any Key to Test it out.</label>
+    <label @ref="label">@Info</label>
+
+    @code {
+        private ElementReference page;
+        private ElementReference label;
+
+        public string Info { get; set; } = "Test";
+
+        protected override async Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await page.FocusAsync();
+        }
+        private void OnKeyDown(KeyboardEventArgs e)
+        {
+            Info = "KeyDown";
+            _ = label.FocusAsync();
+        }
+    }
+</div>

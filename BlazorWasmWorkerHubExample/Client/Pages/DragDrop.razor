@@ -1,0 +1,170 @@
+﻿@page "/dragdrop"
+@using BlazorWasmWorkerHubExample.Shared;
+<h3>DragDrop</h3>
+
+<RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <div style="white-space:nowrap; margin-right: 16px">Density:</div>
+    <RadzenSelectBar @bind-Value="@Density" TextProperty="Text" ValueProperty="Value"
+                     Data="@(Enum.GetValues(typeof(Density)).Cast<Density>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+</RadzenCard>
+<RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <div style="white-space:nowrap; margin-right: 16px">GridLines:</div>
+    <RadzenSelectBar @bind-Value="@GridLines" TextProperty="Text" ValueProperty="Value"
+                     Data="@(Enum.GetValues(typeof(Radzen.DataGridGridLines)).Cast<Radzen.DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+</RadzenCard>
+
+@*<DropTarget T="Model" Drop="@OnDropGrid">
+    <RadzenDataGrid Data="@Data" TItem="Model"
+                    RowRender="@RowRender"
+                    GridLines="@GridLines" Density="@Density"
+                    AllowFiltering="false" AllowColumnResize="true"
+                    SelectionMode="DataGridSelectionMode.Single"
+                    RowSelect="@RowSelect">
+        <Columns>
+            <RadzenDataGridColumn TItem="Model" Property="Id" Title="Id">
+                <Template Context="detail">
+                    <Draggable T="Model">
+                        @detail.Id
+                    </Draggable>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Model" Property="Name" Title="Name"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Model" Property="Job" Title="Job"></RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</DropTarget>
+
+<DropTarget T="Model" Drop="@OnDropGrid">
+    <RadzenDataGrid Data="@Data2" TItem="Model"
+                    GridLines="@GridLines" Density="@Density"
+                    AllowFiltering="false" AllowColumnResize="true"
+                    SelectionMode="DataGridSelectionMode.Single"
+                    RowSelect="@RowSelect">
+        <Columns>
+            <RadzenDataGridColumn TItem="Model" Property="Id" Title="Id">
+                <Template Context="detail">
+                    <Draggable T="Model" >
+                        @detail.Id
+                    </Draggable>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Model" Property="Name" Title="Name"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Model" Property="Job" Title="Job"></RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</DropTarget>
+*@
+
+<hr />
+<h3>Drag Drop Example</h3>
+<style>
+    .draggable {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 1rem;
+        padding: 1rem;
+        display: inline-block;
+        cursor: move;
+    }
+
+    .drop-target {
+        border: 1px dashed #ebebeb;
+        margin: 1rem;
+        padding: 1rem;
+        display: inline-block;
+    }
+</style>
+
+<Draggable Data="@draggableDataA">
+    <div class="draggable">
+        Draggable A
+    </div>
+</Draggable>
+
+<Draggable Data="@draggableDataB">
+    <div class="draggable">
+        Draggable B
+    </div>
+</Draggable>
+
+<DropTarget T="String" Drop="@OnDrop">
+    <div class="drop-target">
+        Accepts Draggable A or B
+    </div>
+</DropTarget>
+
+@if (dropMessage != null)
+{
+    @dropMessage
+}
+
+<DropTarget T="String" Zone="DropZone">
+    <div class="drop-target">
+        Can't drop here
+    </div>
+</DropTarget>
+<hr />
+
+
+@code {
+    Radzen.DataGridGridLines GridLines = Radzen.DataGridGridLines.Default;
+
+    Density Density = Density.Default;
+    List<Model> Data { get; set; } = new List<Model>();
+    List<Model> Data2 { get; set; } = new List<Model>();
+    Model? SelectedRow;
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (var i in Enumerable.Range(1, 10))
+        {
+            Data.Add(Model.Create(i));
+            Data2.Add(Model.Create(i));
+
+
+        }
+        await base.OnInitializedAsync();
+    }
+    private void RowSelect(Model e)
+    {
+        SelectedRow = e;
+    }
+
+    void RowRender(RowRenderEventArgs<Model> args)
+    {
+        args.Attributes.Add("style", "font-weight:bold");
+    }
+
+    string draggableDataA = "Draggable Data A";
+    string draggableDataB = "Draggable Data B";
+
+    string? dropMessage = null;
+
+    void OnDrop(string data)
+    {
+        dropMessage = $"Dropped: {data}";
+
+        // Important: Invoke StateHasChanged() to update the page
+        StateHasChanged();
+    }
+
+    void OnDropGrid(Model data)
+    {
+        
+    }
+}
+
+
+<!--
+
+https://jonhilton.net/blazor-markdown-editor/
+
+https://github.com/xoofx/markdig
+
+
+https://www.radzen.com/blog/blazor-drag-and-drop/
+
+https://forum.radzen.com/t/grid-and-drag-n-drop/8746
+
+https://chrissainty.com/investigating-drag-and-drop-with-blazor/
+
+-->
