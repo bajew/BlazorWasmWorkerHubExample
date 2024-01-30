@@ -18,11 +18,15 @@
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await page.FocusAsync();
+            if(firstRender)
+            {
+                await page.FocusAsync();
+                StateHasChanged();
+            }
         }
         private void OnKeyDown(KeyboardEventArgs e)
         {
-            Info = "KeyDown";
+            Info = "KeyDown" + e.Key;
             _ = label.FocusAsync();
         }
     }
